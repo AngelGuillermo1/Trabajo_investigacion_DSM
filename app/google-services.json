@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "662986022748",
+    "firebase_url": "https://databaseestudiantes-default-rtdb.firebaseio.com",
+    "project_id": "databaseestudiantes",
+    "storage_bucket": "databaseestudiantes.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:662986022748:android:053d69c2fa51578fa8eb99",
+        "android_client_info": {
+          "package_name": "com.example.gestion_estudiantes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGpXtn29Npv5fQQPw3haoHDAyh9l7UVsw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

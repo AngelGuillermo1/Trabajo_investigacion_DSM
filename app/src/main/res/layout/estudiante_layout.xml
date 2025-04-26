@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/tvNombreEstudiante"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nombre del estudiante: "
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvNumeroCarnet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Numero de carnet: "
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvPlanEstudios"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Plan de estudios: "
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Correo Electronico: "
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvTelefono"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Número de telefono: "
+        android:textSize="16sp" />
+
+    <View style="@style/Divider"/>
+
+</LinearLayout>
