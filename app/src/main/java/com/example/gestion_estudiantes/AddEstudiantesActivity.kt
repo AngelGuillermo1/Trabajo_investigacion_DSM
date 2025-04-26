@@ -1,6 +1,5 @@
 package com.example.gestion_estudiantes
 
-import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -10,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.example.gestion_estudiantes.Estudiantes.Estudiante
-import java.util.*
 
 class AddEstudiantesActivity : AppCompatActivity() {
     private var edtNombreEstudiantes: EditText? = null
@@ -37,7 +35,6 @@ class AddEstudiantesActivity : AppCompatActivity() {
         edtTelefono = findViewById(R.id.edtTelefono)
         btnEliminar = findViewById(R.id.btnEliminar)
 
-
         // Configurar botón de eliminar
         btnEliminar?.setOnClickListener { eliminar() }
     }
@@ -46,26 +43,30 @@ class AddEstudiantesActivity : AppCompatActivity() {
         val intent = intent
         if (intent != null && intent.hasExtra("accion") && intent.getStringExtra("accion") == "e") {
             EstudiantesKey = intent.getStringExtra("key")
-            edtNombreEstudiantes?.setText(intent.getStringExtra("nombreActividad"))
-            edtNumeroCarnet?.setText(intent.getStringExtra("fechaInicio"))
-            edtPlanEstudio?.setText(intent.getStringExtra("fechaFin"))
-            edtEmail?.setText(intent.getStringExtra("lugarEvento"))
-            edtTelefono?.setText(intent.getStringExtra("horasFormacion"))
-            btnEliminar?.visibility = View.VISIBLE // Set the delete button to visible
+            edtNombreEstudiantes?.setText(intent.getStringExtra("nombreEstudiantes"))
+            edtNumeroCarnet?.setText(intent.getStringExtra("numeroCarnet"))
+            edtPlanEstudio?.setText(intent.getStringExtra("planEstudios"))
+            edtEmail?.setText(intent.getStringExtra("email"))
+            edtTelefono?.setText(intent.getStringExtra("telefono"))
+            btnEliminar?.visibility = View.VISIBLE // Mostrar el botón de eliminar
         }
     }
-
 
     fun guardar(v: View?) {
         val nombreEstudiante = edtNombreEstudiantes?.text.toString()
         val numeroCarnet = edtNumeroCarnet?.text.toString()
-        val planEduction = edtPlanEstudio?.text.toString()
+        val planEstudio = edtPlanEstudio?.text.toString()
         val email = edtEmail?.text.toString()
-        val telefono = edtTelefono?.text.toString().toInt()
+        val telefono = edtTelefono?.text.toString()
+
+        if (nombreEstudiante.isEmpty() || numeroCarnet.isEmpty() || planEstudio.isEmpty() || email.isEmpty() || telefono.isEmpty()) {
+            Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         database = FirebaseDatabase.getInstance().getReference("estudiantes")
 
-        val estudiante = Estudiante(nombreEstudiante, numeroCarnet, planEduction, email, telefono)
+        val estudiante = Estudiante(EstudiantesKey, nombreEstudiante, numeroCarnet, planEstudio, email, telefono)
 
         if (EstudiantesKey != null) {
             // Actualizar registro existente

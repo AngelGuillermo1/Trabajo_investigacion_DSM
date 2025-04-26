@@ -2,102 +2,110 @@ package com.example.gestion_estudiantes
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.*
-import androidx.appcompat.widget.Toolbar
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.gestion_estudiantes.Estudiantes.Estudiante
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.database.*
 
-class MainActivity : AppCompatActivity() {
-    private var ListaEstudiantes: ListView? = null
-    private var Estudiantes: ArrayList<Estudiante>? = null
+class MainActivity : ComponentActivity() {
+    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
+    private val refEstudiantes: DatabaseReference = database.getReference("estudiantes")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        inicializar()
+        setContent {
+            MainScreen()
+        }
     }
 
-    private fun inicializar() {
-        val fabAgregar: FloatingActionButton = findViewById(R.id.fab_agregar)
-        ListaEstudiantes = findViewById(R.id.ListaEstudiantes)
+    @Composable
+    fun MainScreen() {
+        var estudiantes by remember { mutableStateOf(listOf<Estudiante>()) }
 
-        ListaEstudiantes!!.setOnItemClickListener { _, _, i, _ ->
-            val intent = Intent(this, AddEstudiantesActivity::class.java)
-            intent.putExtra("accion", "e") // Editar
-            val Estudiantes = Estudiantes!![i]
-            intent.putExtra("key", Estudiantes.key)
-            intent.putExtra("nombreEstudiantes", Estudiantes.nombreEstudiantes)
-            intent.putExtra("numeroCarnet", Estudiantes.numeroCarnet)
-            intent.putExtra("planEstudios", Estudiantes.planEstudios)
-            intent.putExtra("email", Estudiantes.email)
-            intent.putExtra("telefono", Estudiantes.telefono)
-            startActivity(intent)
-        }
-
-        ListaEstudiantes!!.onItemLongClickListener = AdapterView.OnItemLongClickListener { _, _, position, _  ->
-
-            val ad = AlertDialog.Builder(this@MainActivity)
-            ad.setMessage("¿Está seguro de eliminar el registro de estudiante?")
-                .setTitle("Confirmación")
-            ad.setPositiveButton("Sí") { _, _ ->
-                Estudiantes!![position].key?.let {
-                    refEstudiantes.child(it).removeValue()
+        // Firebase listener to fetch data
+        LaunchedEffect(Unit) {
+            refEstudiantes.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val estudiantesList = mutableListOf<Estudiante>()
+                    for (dato in dataSnapshot.children) {
+                        val estudiante: Estudiante? = dato.getValue(Estudiante::class.java)
+                        estudiante?.key = dato.key
+                        estudiante?.let { estudiantesList.add(it) }
+                    }
+                    estudiantes = estudiantesList
                 }
-                Toast.makeText(
-                    this@MainActivity,
-                    "Registro borrado!",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            ad.setNegativeButton("No") { _, _ ->
-                Toast.makeText(
-                    this@MainActivity,
-                    "Operación de borrado cancelada!",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            ad.show()
-            true
+
+                override fun onCancelled(databaseError: DatabaseError) {}
+            })
         }
 
-        fabAgregar.setOnClickListener {
-            val intent = Intent(this, AddEstudiantesActivity::class.java)
-            intent.putExtra("accion", "a") // Agregar
-            intent.putExtra("key", "")
-            intent.putExtra("nombreEstudiantes", "")
-            intent.putExtra("numeroCarnet", "")
-            intent.putExtra("planEstudios", "")
-            intent.putExtra("email", "")
-            intent.putExtra("telefono", "")
-            startActivity(intent)
-        }
-
-        Estudiantes = ArrayList()
-
-        refEstudiantes.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                Estudiantes!!.clear()
-                for (dato in dataSnapshot.children) {
-                    val estudiante: Estudiante? = dato.getValue(Estudiante::class.java)
-                    estudiante?.key = dato.key
-                    estudiante?.let { Estudiantes!!.add(it) }
+        Scaffold(
+            floatingActionButton = {
+                FloatingActionButton(onClick = { navigateToAddEstudiante() }) {
+                    Text("+")
                 }
-                val adapter = AdaptadorEstudiantes(
-                    this@MainActivity,
-                    Estudiantes as ArrayList<Estudiante>
-                )
-                ListaEstudiantes!!.adapter = adapter
             }
-
-            override fun onCancelled(databaseError: DatabaseError) {}
-        })
+        ) { paddingValues ->
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                itemsIndexed(estudiantes) { index: Int, estudiante: Estudiante ->
+                    EstudianteItem(
+                        estudiante = estudiante,
+                        index = index + 1, // Add 1 to make it 1-based
+                        onClick = { navigateToEditEstudiante(estudiante) }
+                    )
+                }
+            }
+        }
     }
 
-    companion object {
-        private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-        private val refEstudiantes: DatabaseReference = database.getReference("estudiantes")
+    @Composable
+    fun EstudianteItem(estudiante: Estudiante, index: Int, onClick: () -> Unit) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .clickable { onClick() },
+            elevation = 4.dp
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Estudiante $index", style = MaterialTheme.typography.h6)
+                Text(text = "Nombre: ${estudiante.nombreEstudiantes}", style = MaterialTheme.typography.body1)
+                Text(text = "Carnet: ${estudiante.numeroCarnet}", style = MaterialTheme.typography.body1)
+                Text(text = "Plan de estudios: ${estudiante.planEstudios}", style = MaterialTheme.typography.body2)
+                Text(text = "Email: ${estudiante.email}", style = MaterialTheme.typography.body2)
+                Text(text = "Teléfono: ${estudiante.telefono}", style = MaterialTheme.typography.body2)
+            }
+        }
+    }
+
+    private fun navigateToAddEstudiante() {
+        val intent = Intent(this, AddEstudiantesActivity::class.java)
+        intent.putExtra("accion", "a") // Agregar
+        startActivity(intent)
+    }
+
+    private fun navigateToEditEstudiante(estudiante: Estudiante) {
+        val intent = Intent(this, AddEstudiantesActivity::class.java)
+        intent.putExtra("accion", "e") // Editar
+        intent.putExtra("key", estudiante.key)
+        intent.putExtra("nombreEstudiantes", estudiante.nombreEstudiantes)
+        intent.putExtra("numeroCarnet", estudiante.numeroCarnet)
+        intent.putExtra("planEstudios", estudiante.planEstudios)
+        intent.putExtra("email", estudiante.email)
+        intent.putExtra("telefono", estudiante.telefono)
+        startActivity(intent)
     }
 }
