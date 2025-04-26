@@ -18,6 +18,14 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -47,4 +55,11 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("androidx.compose.ui:ui:1.5.14")
+    implementation("androidx.compose.material:material:1.5.14")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.14")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.5.14")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.14")
+    implementation("androidx.compose.foundation:foundation:1.5.14")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha08")
 }
