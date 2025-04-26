@@ -1,68 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:padding=" 80dp">
 
-    <EditText
-        android:id="@+id/edtNombreEstudiantes"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nombre de Estudiante"
-        android:inputType="text"
-        android:minHeight="48dp" />
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/edtNumeroCarnet"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Numero de carnet"
-        android:minHeight="48dp" />
+        <EditText
+            android:id="@+id/edtNombreEstudiantes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre de Estudiante"
+            android:inputType="text"
+            android:minHeight="48dp" />
 
-    <EditText
-        android:id="@+id/edtPlanEstudio"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Plan de Estudio"
-        android:minHeight="48dp" />
+        <EditText
+            android:id="@+id/edtNumeroCarnet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Número de Carnet"
+            android:inputType="text"
+            android:minHeight="48dp" />
 
-    <EditText
-        android:id="@+id/edtEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="correo electrónico del estudiante"
-        android:inputType="text"
-        android:minHeight="48dp" />
+        <EditText
+            android:id="@+id/edtPlanEstudio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Plan de Estudio"
+            android:inputType="text"
+            android:minHeight="48dp" />
 
-    <EditText
-        android:id="@+id/edtTelefono"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Telefono del estudiante"
-        android:inputType="number"
-        android:minHeight="48dp" />
+        <EditText
+            android:id="@+id/edtEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Correo Electrónico"
+            android:inputType="textEmailAddress"
+            android:minHeight="48dp" />
 
+        <EditText
+            android:id="@+id/edtTelefono"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Teléfono"
+            android:inputType="phone"
+            android:minHeight="48dp" />
 
-    <Button
-        android:id="@+id/btnGuardar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="guardar"
-        android:text="Guardar" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="16dp">
 
-    <Button
-        android:id="@+id/btnCancelar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="cancelar"
-        android:text="Cancelar" />
+            <Button
+                android:id="@+id/btnGuardar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="guardar"
+                android:text="Guardar" />
 
-    <Button
-        android:id="@+id/btnEliminar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Eliminar"
-        android:visibility="gone" />
+            <Button
+                android:id="@+id/btnCancelar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="cancelar"
+                android:text="Cancelar"
+                android:layout_marginStart="8dp" />
 
-</LinearLayout>
+            <Button
+                android:id="@+id/btnEliminar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Eliminar"
+                android:visibility="gone"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
