@@ -1,86 +1,161 @@
 package com.example.gestion_estudiantes
 
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.gestion_estudiantes.Estudiantes.Estudiante
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.example.gestion_estudiantes.Estudiantes.Estudiante
 
-class AddEstudiantesActivity : AppCompatActivity() {
-    private var edtNombreEstudiantes: EditText? = null
-    private var edtNumeroCarnet: EditText? = null
-    private var edtPlanEstudio: EditText? = null
-    private var edtEmail: EditText? = null
-    private var edtTelefono: EditText? = null
+class AddEstudiantesActivity : ComponentActivity() {
     private lateinit var database: DatabaseReference
-    private var EstudiantesKey: String? = null
-    private var btnEliminar: Button? = null
+    private var estudiantesKey: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_estudiantes)
-        inicializar()
-        checkIntentData()
-    }
 
-    private fun inicializar() {
-        edtNombreEstudiantes = findViewById(R.id.edtNombreEstudiantes)
-        edtNumeroCarnet = findViewById(R.id.edtNumeroCarnet)
-        edtPlanEstudio = findViewById(R.id.edtPlanEstudio)
-        edtEmail = findViewById(R.id.edtEmail)
-        edtTelefono = findViewById(R.id.edtTelefono)
-        btnEliminar = findViewById(R.id.btnEliminar)
+        // Recibir datos del intent
+        val accion = intent.getStringExtra("accion")
+        estudiantesKey = intent.getStringExtra("key")
+        val nombreEstudiantes = intent.getStringExtra("nombreEstudiantes") ?: ""
+        val numeroCarnet = intent.getStringExtra("numeroCarnet") ?: ""
+        val planEstudios = intent.getStringExtra("planEstudios") ?: ""
+        val email = intent.getStringExtra("email") ?: ""
+        val telefono = intent.getStringExtra("telefono") ?: ""
 
-        // Configurar botón de eliminar
-        btnEliminar?.setOnClickListener { eliminar() }
-    }
-
-    private fun checkIntentData() {
-        val intent = intent
-        if (intent != null && intent.hasExtra("accion") && intent.getStringExtra("accion") == "e") {
-            EstudiantesKey = intent.getStringExtra("key")
-            edtNombreEstudiantes?.setText(intent.getStringExtra("nombreEstudiantes"))
-            edtNumeroCarnet?.setText(intent.getStringExtra("numeroCarnet"))
-            edtPlanEstudio?.setText(intent.getStringExtra("planEstudios"))
-            edtEmail?.setText(intent.getStringExtra("email"))
-            edtTelefono?.setText(intent.getStringExtra("telefono"))
-            btnEliminar?.visibility = View.VISIBLE // Mostrar el botón de eliminar
+        setContent {
+            AddEstudiantesScreen(
+                nombreEstudiantes = nombreEstudiantes,
+                numeroCarnet = numeroCarnet,
+                planEstudios = planEstudios,
+                email = email,
+                telefono = telefono,
+                isEditMode = accion == "e",
+                onSave = { estudiante -> guardar(estudiante) },
+                onDelete = { eliminar() },
+                onCancel = { finish() }
+            )
         }
     }
 
-    fun guardar(v: View?) {
-        val nombreEstudiante = edtNombreEstudiantes?.text.toString()
-        val numeroCarnet = edtNumeroCarnet?.text.toString()
-        val planEstudio = edtPlanEstudio?.text.toString()
-        val email = edtEmail?.text.toString()
-        val telefono = edtTelefono?.text.toString()
+    @Composable
+    fun AddEstudiantesScreen(
+        nombreEstudiantes: String,
+        numeroCarnet: String,
+        planEstudios: String,
+        email: String,
+        telefono: String,
+        isEditMode: Boolean,
+        onSave: (Estudiante) -> Unit,
+        onDelete: () -> Unit,
+        onCancel: () -> Unit
+    ) {
+        var nombre by remember { mutableStateOf(nombreEstudiantes) }
+        var carnet by remember { mutableStateOf(numeroCarnet) }
+        var plan by remember { mutableStateOf(planEstudios) }
+        var correo by remember { mutableStateOf(email) }
+        var telefonoEstudiante by remember { mutableStateOf(telefono) }
 
-        if (nombreEstudiante.isEmpty() || numeroCarnet.isEmpty() || planEstudio.isEmpty() || email.isEmpty() || telefono.isEmpty()) {
-            Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
-            return
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            TextField(
+                value = nombre,
+                onValueChange = { nombre = it },
+                label = { Text("Nombre del Estudiante") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            TextField(
+                value = carnet,
+                onValueChange = { carnet = it },
+                label = { Text("Número de Carnet") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            TextField(
+                value = plan,
+                onValueChange = { plan = it },
+                label = { Text("Plan de Estudios") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            TextField(
+                value = correo,
+                onValueChange = { correo = it },
+                label = { Text("Correo Electrónico") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            TextField(
+                value = telefonoEstudiante,
+                onValueChange = { telefonoEstudiante = it },
+                label = { Text("Teléfono") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(onClick = onCancel) {
+                    Text("Cancelar")
+                }
+                if (isEditMode) {
+                    Button(onClick = onDelete) {
+                        Text("Eliminar")
+                    }
+                }
+                Button(onClick = {
+                    if (nombre.isNotEmpty() && carnet.isNotEmpty() && plan.isNotEmpty() &&
+                        correo.isNotEmpty() && telefonoEstudiante.isNotEmpty()
+                    ) {
+                        val estudiante = Estudiante(
+                            key = estudiantesKey,
+                            nombreEstudiantes = nombre,
+                            numeroCarnet = carnet,
+                            planEstudios = plan,
+                            email = correo,
+                            telefono = telefonoEstudiante
+                        )
+                        onSave(estudiante)
+                    } else {
+                        Toast.makeText(
+                            this@AddEstudiantesActivity,
+                            "Por favor, completa todos los campos",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }) {
+                    Text("Guardar")
+                }
+            }
         }
+    }
 
+    private fun guardar(estudiante: Estudiante) {
         database = FirebaseDatabase.getInstance().getReference("estudiantes")
 
-        val estudiante = Estudiante(EstudiantesKey, nombreEstudiante, numeroCarnet, planEstudio, email, telefono)
-
-        if (EstudiantesKey != null) {
+        if (estudiante.key != null) {
             // Actualizar registro existente
-            database.child(EstudiantesKey!!).setValue(estudiante).addOnSuccessListener {
+            database.child(estudiante.key!!).setValue(estudiante).addOnSuccessListener {
                 Toast.makeText(this, "Se actualizó con éxito", Toast.LENGTH_SHORT).show()
+                finish()
             }.addOnFailureListener {
                 Toast.makeText(this, "Error al actualizar", Toast.LENGTH_SHORT).show()
             }
         } else {
             // Agregar nuevo registro
-            val newKey = database.push().key // Generar una nueva clave
+            val newKey = database.push().key
             if (newKey != null) {
+                estudiante.key = newKey
                 database.child(newKey).setValue(estudiante).addOnSuccessListener {
                     Toast.makeText(this, "Se guardó con éxito", Toast.LENGTH_SHORT).show()
+                    finish()
                 }.addOnFailureListener {
                     Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show()
                 }
@@ -88,22 +163,17 @@ class AddEstudiantesActivity : AppCompatActivity() {
                 Toast.makeText(this, "No se pudo generar una clave", Toast.LENGTH_SHORT).show()
             }
         }
-        finish()
     }
 
     private fun eliminar() {
-        if (EstudiantesKey != null) {
+        if (estudiantesKey != null) {
             database = FirebaseDatabase.getInstance().getReference("estudiantes")
-            database.child(EstudiantesKey!!).removeValue().addOnSuccessListener {
-                Toast.makeText(this, "Registro de estudiante eliminado con éxito", Toast.LENGTH_SHORT).show()
+            database.child(estudiantesKey!!).removeValue().addOnSuccessListener {
+                Toast.makeText(this, "Registro eliminado con éxito", Toast.LENGTH_SHORT).show()
                 finish()
             }.addOnFailureListener {
                 Toast.makeText(this, "Error al eliminar el registro", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    fun cancelar(v: View?) {
-        finish()
     }
 }
