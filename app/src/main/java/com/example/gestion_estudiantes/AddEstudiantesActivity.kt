@@ -5,13 +5,14 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.gestion_estudiantes.Estudiantes.Estudiante
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.example.gestion_estudiantes.ui.theme.GestionEstudiantesTheme // Asegúrate de importar el tema
 
 class AddEstudiantesActivity : ComponentActivity() {
     private lateinit var database: DatabaseReference
@@ -30,17 +31,19 @@ class AddEstudiantesActivity : ComponentActivity() {
         val telefono = intent.getStringExtra("telefono") ?: ""
 
         setContent {
-            AddEstudiantesScreen(
-                nombreEstudiantes = nombreEstudiantes,
-                numeroCarnet = numeroCarnet,
-                planEstudios = planEstudios,
-                email = email,
-                telefono = telefono,
-                isEditMode = accion == "e",
-                onSave = { estudiante -> guardar(estudiante) },
-                onDelete = { eliminar() },
-                onCancel = { finish() }
-            )
+            GestionEstudiantesTheme { // Aquí aplicas el tema
+                AddEstudiantesScreen(
+                    nombreEstudiantes = nombreEstudiantes,
+                    numeroCarnet = numeroCarnet,
+                    planEstudios = planEstudios,
+                    email = email,
+                    telefono = telefono,
+                    isEditMode = accion == "e",
+                    onSave = { estudiante -> guardar(estudiante) },
+                    onDelete = { eliminar() },
+                    onCancel = { finish() }
+                )
+            }
         }
     }
 
